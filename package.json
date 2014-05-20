@@ -7,7 +7,7 @@
     "test": "make test"
   },
   "dependencies": {
-    "superagent": "0.15.1",
+    "superagent": "https://github.com/mbelshe/superagent/archive/17f21a4e2bfc3b42a7f826096eba52ea2e43a2dc.tar.gz",
     "methods": "0.0.1"
   },
   "devDependencies": {

@@ -4,7 +4,8 @@ var request = require('..')
   , fs = require('fs')
   , path = require('path')
   , should = require('should')
-  , express = require('express');
+  , express = require('express')
+  , parse = require('url').parse;
 
 describe('request(url)', function(){
   it('should be supported', function(done){
@@ -402,6 +403,21 @@ describe('request.agent(app)', function(){
     else res.send(':(')
   });
 
+  app.get('/gettoken', function(req, res){
+    var url = parse(req.url);
+    res.json(200, { domain: req.url.host, token: 'mytoken'});
+  });
+
+  app.get('/needstoken', function(req, res){
+    var auth = req.headers['authenticate'];
+    if (auth == 'Bearer mytoken') {
+      res.send(200, 'ok!');
+    } else {
+      res.send(401, 'uhoh');
+    }
+  });
+
+
   var agent = request.agent(app);
 
   it('should save cookies', function(done){
@@ -414,5 +430,20 @@ describe('request.agent(app)', function(){
     agent
     .get('/return')
     .expect('hey', done);
+  })
+
+  it('get tokens', function(done){
+    agent
+    .get('/gettoken')
+    .end(function(err, res) {
+      agent.saveToken(res.body.token);
+      done();
+    });
+  })
+
+  it('should send tokens', function(done){
+    agent
+    .get('/needstoken')
+    .expect('ok!', done);
   })
 })
